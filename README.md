@@ -1,26 +1,28 @@
 # SmartStock · Ventas
 
-Microservicio que registra ventas y conserva el historial de demanda por SKU. Coordina el descuento de existencias con Inventario.
+Microservicio que registra las ventas de SmartStock y mantiene el historial de demanda de cada SKU. El historial sirve tanto para consultar ventas como para evaluar la necesidad de reposición.
 
 **Stack** · Java 21, Spring Boot, PostgreSQL y gRPC.
 
-## Alcance del MVP
+## Responsabilidades
 
-- Recibir del Gateway una venta con su identificador, SKU y cantidad.
-- Solicitar a Inventario el descuento por gRPC y confirmar la venta cuando el descuento se completa.
-- Exponer el historial de ventas por SKU para el análisis de reposición.
+- Recibir solicitudes de venta e identificar cada operación con un `sale_id`.
+- Coordinar con Inventario el descuento de existencias y reflejar su resultado en el registro de la venta.
+- Conservar los datos de la venta y exponer el historial por SKU para su consulta desde el Gateway.
 
-## Integraciones
+## Datos y consistencia
 
-| Conexión | Protocolo | Operación |
+Ventas es dueño de su registro de operaciones y del historial de demanda. Inventario es dueño del saldo. Una venta queda confirmada una vez que se completa el descuento. Si Inventario rechaza la operación por falta de unidades, la venta queda sin confirmar. Los reintentos usan el mismo identificador para que Inventario pueda reconocer una solicitud ya procesada.
+
+## Interfaces
+
+| Interlocutor | Canal | Propósito |
 |---|---|---|
-| Gateway → Ventas | gRPC | Registrar una venta y consultar el historial. |
-| Ventas → Inventario | gRPC | Invocar `DeductStock(sale_id, sku, quantity)`. |
+| `smartstock-gateway` | gRPC | Registrar ventas y consultar su historial. |
+| `smartstock-inventario` | gRPC | Solicitar el descuento de las unidades vendidas. |
 
-Ante un reintento de la misma venta, Ventas conserva el `sale_id` para que Inventario pueda reconocer la operación. El contrato de Inventario se mantiene en `smartstock-infra/contracts/proto/inventory/v1/inventory.proto`.
+Los contratos Protobuf compartidos se versionan en `smartstock-infra/contracts/`.
 
-## Primera verificación
+## Desarrollo y despliegue
 
-Registrar una venta de 3 unidades y comprobar que Inventario descuenta esas unidades. Si la cantidad supera el saldo disponible, la venta debe quedar sin confirmar.
-
-El historial se guarda en la base PostgreSQL de Ventas. El repo tendrá su Dockerfile, su pipeline y una exigencia de cobertura mínima del 60 %. El despliegue en Kubernetes se integra desde `smartstock-infra`.
+Este repositorio mantiene la aplicación Spring Boot, su base PostgreSQL y sus migraciones, sus pruebas, su Dockerfile y su pipeline. La cobertura mínima exigida es del 60 %. Las pruebas del servicio verifican la confirmación de ventas, el tratamiento de rechazos y el comportamiento ante reintentos. Docker Compose y Kubernetes se coordinan desde `smartstock-infra`.
