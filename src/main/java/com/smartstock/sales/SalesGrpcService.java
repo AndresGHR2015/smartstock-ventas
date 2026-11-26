@@ -4,6 +4,8 @@ import com.smartstock.contracts.sales.v1.CreateSaleRequest;
 import com.smartstock.contracts.sales.v1.CreateSaleResponse;
 import com.smartstock.contracts.sales.v1.GetSaleRequest;
 import com.smartstock.contracts.sales.v1.GetSaleResponse;
+import com.smartstock.contracts.sales.v1.GetSalesOverviewRequest;
+import com.smartstock.contracts.sales.v1.GetSalesOverviewResponse;
 import com.smartstock.contracts.sales.v1.Sale;
 import com.smartstock.contracts.sales.v1.SalesServiceGrpc;
 import io.grpc.Status;
@@ -60,6 +62,17 @@ public class SalesGrpcService extends SalesServiceGrpc.SalesServiceImplBase {
         } catch (RuntimeException e) {
             log.error("GetSale failed", e);
             observer.onError(Status.INTERNAL.withDescription("Sales lookup failed").asRuntimeException());
+        }
+    }
+
+    @Override
+    public void getSalesOverview(GetSalesOverviewRequest request, StreamObserver<GetSalesOverviewResponse> observer) {
+        try {
+            observer.onNext(store.overview());
+            observer.onCompleted();
+        } catch (RuntimeException e) {
+            log.error("GetSalesOverview failed", e);
+            observer.onError(Status.INTERNAL.withDescription("Sales overview failed").asRuntimeException());
         }
     }
 }

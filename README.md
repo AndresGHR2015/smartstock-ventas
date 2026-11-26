@@ -29,7 +29,7 @@ Este repositorio mantiene la aplicación Spring Boot, su base PostgreSQL y sus m
 
 ### Contratos y límites de integración
 
-Las clases gRPC se generan desde el submódulo `vendor/smartstock-infra`, fijado al commit `6237ae7a047c3a16077db5bdd51a6ee89f5f90f1`. Inicializarlo con `git submodule update --init --recursive` antes de compilar o construir la imagen. CI necesita acceso de lectura a la URL del submódulo y al commit; su publicación y acceso deben confirmarse con el coordinador.
+Las clases gRPC se generan desde el submódulo `vendor/smartstock-infra`, fijado al commit `9336529e839c465e1a28bc9976df7a177068ca94`. Inicializarlo con `git submodule update --init --recursive` antes de compilar o construir la imagen. CI necesita acceso de lectura a la URL del submódulo y al commit; su publicación y acceso deben confirmarse con el coordinador.
 
 El contrato v1 permite consultar una venta por identificador. El historial por SKU requiere una revisión del contrato. Inventario controla el descuento idempotente mediante gRPC. Las pruebas de este repositorio usan un doble de Inventario. El flujo 10 → 7 con Inventario real se comprueba en Docker Compose de `smartstock-infra`.
 

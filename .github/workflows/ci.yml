@@ -25,7 +25,7 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
-      - run: test "$(git -C vendor/smartstock-infra rev-parse HEAD)" = 6237ae7a047c3a16077db5bdd51a6ee89f5f90f1
+      - run: test "$(git -C vendor/smartstock-infra rev-parse HEAD)" = 9336529e839c465e1a28bc9976df7a177068ca94
       - run: mvn -B verify
       - run: docker build -t smartstock-sales .
       - uses: actions/upload-artifact@v4
