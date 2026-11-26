@@ -1,0 +1,11 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL:jdbc:postgresql://localhost:5432/sales}
+    username: ${DATABASE_USER:sales}
+    password: ${DATABASE_PASSWORD:sales}
+sales:
+  grpc-port: ${GRPC_PORT:9090}
+  inventory-target: ${INVENTORY_TARGET:localhost:9091}
+  inventory-timeout-ms: ${INVENTORY_TIMEOUT_MS:2000}
+  recovery-interval-ms: ${RECOVERY_INTERVAL_MS:5000}
+  recovery-batch-size: ${RECOVERY_BATCH_SIZE:100}

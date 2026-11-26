@@ -1,0 +1,3 @@
+[submodule "vendor/smartstock-infra"]
+	path = vendor/smartstock-infra
+	url = https://github.com/AndresGHR2015/smartstock-infra.git

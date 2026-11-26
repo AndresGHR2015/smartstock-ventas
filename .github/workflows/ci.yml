@@ -1,0 +1,35 @@
+name: sales-ci
+on:
+  push:
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: sales
+          POSTGRES_USER: sales
+          POSTGRES_PASSWORD: sales
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U sales -d sales"
+          --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+      - run: test "$(git -C vendor/smartstock-infra rev-parse HEAD)" = 6237ae7a047c3a16077db5bdd51a6ee89f5f90f1
+      - run: mvn -B verify
+      - run: docker build -t smartstock-sales .
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage
+          path: target/site/jacoco/
